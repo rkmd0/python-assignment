@@ -1,10 +1,11 @@
 # Yahtzee Game Logic Exercise
 # Implement the logic for each function as described in the docstrings
+import random
 
 def roll_dice(n=5):
     """Roll n dice with values between 1-6."""
     # Hint: Generate a list of random integers between 1 and 6 with length n
-    return
+    return [random.randint(1, 6) for i in range(n)]
 
 
 def create_empty_scorecard():
@@ -12,7 +13,22 @@ def create_empty_scorecard():
     # Hint: Create a dictionary with keys for each score category, initialized to None
     # Categories include: '1', '2', ..., '6', 'three_of_a_kind', 'four_of_a_kind',
     # 'full_house', 'four_straight', 'five_straight', 'yahtzee', 'chance'
-    return
+    category = {
+        '1': None,
+        '2': None,
+        '3': None,
+        '4': None,
+        '5': None,
+        '6': None,
+        'three_of_a_kind': None,
+        'four_of_a_kind': None,
+        'full_house': None,
+        'four_straight': None,
+        'five_straight': None,
+        'yahtzee': None,
+        'chance': None
+    }
+    return category
 
 
 def select_keep(dice):

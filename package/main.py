@@ -17,7 +17,7 @@ def main():
     # If upper section total >= 63, bonus = 35
     # --- [Your code here] ---
     
-    print(f"\nGame over! Final score: {}")
+    #print(f"\nGame over! Final score: {}")
 
 if __name__ == "__main__":
     main()
