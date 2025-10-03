@@ -35,13 +35,41 @@ def select_keep(dice):
     """Prompt user to select which dice to keep."""
     # Hint: Use input() to get user selection of which dice to keep.
     # Ensure selected numbers are in current dice.
-    return
+    print(f"current dice: {dice}")
+    
+    while True:
+        user_input = input("enter the dice you want to keep (e.g., 135), or press enter to reroll all: ")
+        # because why wouldnt we want to reroll all
+        if user_input == "":
+            return []       
+
+        try:
+            kept = [int(ch) for ch in user_input]
+        except ValueError:
+            print("invalid input. please enter numbers corresponding to the dice values.")
+            continue
+
+        temp_dice = dice.copy()
+        valid = True
+        for value in kept:
+            if value in temp_dice:
+                temp_dice.remove(value)
+            else:
+                print(f"you don't have a die with value {value}. please try again.")
+                valid = False
+                break
+        if valid:
+            return kept
+        else:
+            print("please try again omg")
 
 
 def reroll(dice, kept):
     """Reroll dice that weren't kept."""
     # Hint: Calculate number of dice to reroll, roll them, and combine with kept dice
-    return
+    num_of_dice_to_reroll = len(dice) - len(kept)
+    new_dice = roll_dice(num_of_dice_to_reroll)
+    return kept + new_dice
 
 
 def has_straight(dice, length):
