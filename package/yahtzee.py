@@ -1,6 +1,7 @@
 # Yahtzee Game Logic Exercise
 # Implement the logic for each function as described in the docstrings
 import random
+from collections import Counter
 
 def roll_dice(n=5):
     """Roll n dice with values between 1-6."""
@@ -75,29 +76,87 @@ def reroll(dice, kept):
 def has_straight(dice, length):
     """Check for straights (sequences) in dice."""
     # Hint: Check if there is a sequence of 'length' consecutive numbers in dice
-    return
+    unique_sorted = sorted(set(dice))
+    count = 1
+    for i in range(1, len(unique_sorted)):
+        if unique_sorted[i] == unique_sorted[i - 1] + 1:
+            count += 1
+            if count >= length:
+                return True
+        else:
+            count = 1
 
+    return False
 
 def evaluate(dice):
     """Calculate scores for all possible categories based on current dice."""
     # Hint: For each category, calculate the score based on the dice
     # Example: three_of_a_kind checks if there are at least three dice showing the same face
-    return
+    scores = {}
+    counts = Counter(dice)
+    for i in range(1, 7):
+        scores[str(i)] = dice.count(i) * i
+    scores['three_of_a_kind'] = sum(dice) if max(counts.values()) >= 3 else 0
+    scores['four_of_a_kind'] = sum(dice) if max(counts.values()) >= 4 else 0
+    if sorted(counts.values()) == [2, 3]:
+        scores['full_house'] = 25
+    else:
+        scores['full_house'] = 0
+    scores['four_straight'] = 30 if has_straight(dice, 4) else 0
+    scores['five_straight'] = 40 if has_straight(dice, 5) else 0
+    scores['yahtzee'] = 50 if max(counts.values()) == 5 else 0
+    scores['chance'] = sum(dice)
+    return scores
 
 
 def choose(scores, used):
     """Present available scoring options to player and get their selection."""
     # Hint: Display available scoring options to the user and get their choice
-    return
+    print("\nAvailable categories:")
+    available = {category: val for category, val in scores.items() if category not in used}
+
+    for i, (category, val) in enumerate(available.items(), 1):
+        print(f"{i}. {category} → {val}")
+
+    while True:
+        choice = input("Choose a category by number: ")
+        if choice.isdigit():
+            choice = int(choice)
+            if 1 <= choice <= len(available):
+                chosen_category = list(available.keys())[choice - 1]
+                return chosen_category, scores[chosen_category]
+        print("Invalid choice, try again.")
 
 
 def display_scorecard(card):
     """Display current scorecard with all categories and their scores."""
     # Hint: Iterate over the scorecard and print each category along with its score
-    return
-
+    print("\n--- Scorecard ---")
+    upper_total = 0
+    for category, score in card.items():
+        print(f"{category:15} : {score}")
+        if category in ['1', '2', '3', '4', '5', '6'] and score is not None:
+            upper_total += score
+    bonus = 35 if upper_total >= 63 else 0
+    total = sum(v for v in card.values() if v is not None) + bonus
+    print(f"Upper Section Total: {upper_total}")
+    print(f"Bonus: {bonus}")
+    print(f"Total Score: {total}")
 
 def play_round(card):
     """Play one round of Yahtzee with 3 rolls."""
     # Hint: Implement the round logic which includes rolling and rerolling dice
-    return
+    dice = roll_dice(5)
+    print(f"First roll: {dice}")
+    for roll in range(2, 4):  # até 2 rerolls
+        kept = select_keep(dice)
+        dice = reroll(dice, kept)
+        print(f"Roll {roll}: {dice}")
+        again = input("Reroll again? (y/n): ")
+        if again.lower() != "y":
+            break
+    scores = evaluate(dice)
+    used = [k for k, v in card.items() if v is not None]
+    chosen_category, points = choose(scores, used)
+    card[chosen_category] = points
+    display_scorecard(card)
